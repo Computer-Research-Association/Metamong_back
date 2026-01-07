@@ -8,23 +8,9 @@
 
 ---
 
-## 1. 초기 설치 (최초 1회)
+## 1. 설치
 
-시스템에 `uv`가 설치되어 있지 않다면 아래 명령어로 설치해 주세요.
-
-- **macOS / Linux:**
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-```
-
-- **Windows (PowerShell):**
-
-```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-
-```
+[uv 깃허브](https://github.com/astral-sh/uv?tab=readme-ov-file#installation) 에서 installation 방법 숙지 후 설치
 
 ---
 
