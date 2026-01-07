@@ -1,0 +1,38 @@
+name: CI/CD Deployment
+
+# deploy 실행 조건
+on:
+  push:
+    branches: ["main"] # main 브랜치에 코드가 push 시
+  workflow_dispatch: # 테스트용 - 수동으로 배포 버튼 클릭시
+
+jobs:
+  deploy:
+    # 미니 PC의 Runner 에서 실행
+    runs-on: self-hosted
+
+    steps:
+      # 최신 코드 가져오기
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # GitHub Secrets를 사용하여 .env 파일 생성
+      # 서버의 보안을 위해 실제 비밀번호는 GitHub Settings의 Secrets에 저장해야 함.
+      - name: Create .env file
+        run: |
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "NODE_ENV=production" >> .env
+          # 필요한 다른 환경변수가 있다면 여기에 추가하세요.
+
+      # docker compose 실행
+      - name: Docker Compose Deploy
+        run: |
+          # --build: 코드가 바뀌었으므로 새로 이미지를 빌드합니다.
+          # -d: 백그라운드에서 실행합니다.
+          docker compose down
+          docker compose up --build -d
+
+      # 도커 용량 최적화 (안 쓰는 오래된 이미지 삭제) -> 빌드 후 찌꺼기 제거
+      - name: Cleanup unused Docker images
+        run: docker image prune -f

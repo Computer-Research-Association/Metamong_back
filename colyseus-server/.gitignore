@@ -1,0 +1,13 @@
+node_modules
+build
+dist/
+lib/
+out/
+.colyseus-cloud.json
+.devmode.json
+
+.env
+.env.development
+.env.production
+.env.local
+
