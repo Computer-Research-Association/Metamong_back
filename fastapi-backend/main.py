@@ -1,6 +1,13 @@
-def main():
-    print("Hello from fastapi-backend!")
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.get("/")
+def read_root():
+    return {"message": "Hello from fastapi-backend!", "version": "3.11"}
 
 
 if __name__ == "__main__":
-    main()
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
