@@ -1,4 +1,4 @@
-FROM astral-sh/uv:python3.11-bookworm-slim
+FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim
 
 # 작업 디렉토리 설정
 WORKDIR /app
