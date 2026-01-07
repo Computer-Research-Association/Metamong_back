@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: General Discussion
+    url: https://github.com/사용자아이디/리포지토리이름/discussions
+    about: 템플릿에 해당하지 않는 일반적인 문의는 디스커션을 이용해 주세요.

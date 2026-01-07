@@ -1,0 +1,36 @@
+name: Feature Request
+description: 새로운 기능이나 개선 아이디어를 제안합니다.
+title: "[Feat]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: 제안하는 기능
+      description: 어떤 기능이 필요한지 설명해 주세요.
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 우선순위 제안
+      options:
+        - Low
+        - Medium
+        - High
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 제안 배경
+      description: 이 기능이 왜 필요한지, 어떤 문제를 해결하는지 적어주세요.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 체크리스트
+      options:
+        - label: 기존 기능과 충돌이 없는가?
+          required: true
+        - label: 관련 문서를 확인해 보았는가?
+          required: true
