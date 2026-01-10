@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 
-from app.db.database import engine
+from app.db.database import engine, get_db
 from app.db import models
+from sqlalchemy.orm import Session
 
 from app.core.config import settings
 
@@ -14,6 +15,11 @@ app = FastAPI(title=settings.PROJECT_NAME)
 @app.get("/")
 def read_root():
     return {"message": "Hello from fastapi-backend!", "version": "3.11"}
+
+
+@app.get("/db-test")
+def test_db(db: Session = Depends(get_db)):
+    return {"message": "DB connection successful"}
 
 
 if __name__ == "__main__":
