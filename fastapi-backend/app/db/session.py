@@ -9,3 +9,12 @@ engine = create_engine(settings.DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
+
+
+# Dependency: DB 세션 주입
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
