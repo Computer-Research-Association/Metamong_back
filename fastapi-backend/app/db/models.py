@@ -100,3 +100,17 @@ Index(
     unique=True,
 )
 Index("idx_room_tiles_asset", RoomTile.tile_asset_id)
+
+
+class RoomObject(Base):
+    __tablename__ = "room_objects"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    room_id = Column(BigInteger, ForeignKey("rooms.id"), nullable=False)
+
+    x = Column(Integer, nullable=False)
+    y = Column(Integer, nullable=False)
+
+    object_asset_id = Column(String(100), nullable=False)
+
+    room = relationship("Room")
