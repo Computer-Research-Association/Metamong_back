@@ -33,7 +33,7 @@ class RC(enum.Enum):
     Torrey = "Torrey"
     JangGiRyeo = "JangGiRyeo"
     Kuyper = "Kuyper"
-    SonYangwon = "SonYangwon"
+    SonYangWon = "SonYangWon"
     Philadelphos = "Philadelphos"
     Carmichael = "Carmichael"
 
