@@ -29,3 +29,6 @@ class User(Base):
 
     owned_teams = relationship("Team", back_populates="owner")
 
+
+Index("idx_users_auth_provider", User.auth_provider)
+Index("idx_users_last_room_id", User.last_room_id)
