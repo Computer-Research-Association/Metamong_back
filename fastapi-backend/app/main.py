@@ -8,6 +8,9 @@ app = FastAPI(title=settings.PROJECT_NAME)
 
 # Authlib 세션 관리
 app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
+# Router 등록
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+
 
 @app.get("/")
 def read_root():
