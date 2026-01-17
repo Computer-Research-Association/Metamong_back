@@ -1,10 +1,7 @@
-from fastapi import FastAPI, Depends
-
-from app.db.database import engine, get_db
-from app.db import models
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
 
 from app.core.config import settings
+from app.routers import auth
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
