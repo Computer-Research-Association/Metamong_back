@@ -31,3 +31,9 @@ class RoomType(Enum):
     GENERAL = "GENERAL"
     CUSTOM = "CUSTOM"
     BUILDING = "BUILDING"
+
+
+class OwnerType(Enum):
+    USER = "USER"
+    TEAM = "TEAM"
+    SYSTEM = "SYSTEM"
