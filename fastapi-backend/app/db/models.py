@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
-from app.db.enums import AuthProvider, RC, UserStatus, RoomType, OwnerType
+from app.db.enums import AuthProvider, RC, UserStatus, RoomType, OwnerType, RoomRoleType
 
 
 class User(Base):
@@ -147,3 +147,17 @@ Index(
     RoomPortal.from_x,
     RoomPortal.from_y,
 )
+
+
+class RoomRole(Base):
+    __tablename__ = "room_roles"
+
+    room_id = Column(BigInteger, ForeignKey("rooms.id"), primary_key=True)
+    user_id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
+
+    role = Column(Enum(RoomRoleType),
+                  nullable=False,
+                  default=RoomRoleType.VISITOR
+                  )
+    created_at = Column(DateTime(timezone=True),
+                        nullable=False, server_default=func.now())
