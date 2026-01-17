@@ -32,3 +32,16 @@ class User(Base):
 
 Index("idx_users_auth_provider", User.auth_provider)
 Index("idx_users_last_room_id", User.last_room_id)
+
+
+class Team(Base):
+    __tablename__ = "teams"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    name = Column(String(50), nullable=False, unique=True)
+
+    owner_user_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime(timezone=True),
+                        nullable=False, server_default=func.now())
+
+    owner = relationship("User", back_populates="owned_teams")
