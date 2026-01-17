@@ -15,4 +15,6 @@ class AuthService:
                 "nickname": user_info.get("name")
             }
 
+        # TODO: 다른 프로바이더 (NAVER, KAKAO) 도 균일한 정보를 리턴하도록 분기처리
+
         return {}
