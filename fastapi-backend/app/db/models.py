@@ -75,3 +75,18 @@ class Room(Base):
 Index("idx_rooms_room_type", Room.room_type)
 Index("idx_rooms_owner", Room.owner_type, Room.owner_id)
 Index("idx_rooms_is_public", Room.is_public)
+
+
+class RoomTile(Base):
+    __tablename__ = "room_tiles"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    room_id = Column(BigInteger, ForeignKey("rooms.id"), nullable=False)
+
+    x = Column(Integer, nullable=False)
+    y = Column(Integer, nullable=False)
+
+    tile_asset_id = Column(BigInteger, nullable=False)
+
+    room = relationship("Room")
+
