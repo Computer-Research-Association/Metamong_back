@@ -90,3 +90,13 @@ class RoomTile(Base):
 
     room = relationship("Room")
 
+
+Index("idx_room_tiles_room_id", RoomTile.room_id)
+Index(
+    "uq_room_tiles_position",
+    RoomTile.room_id,
+    RoomTile.x,
+    RoomTile.y,
+    unique=True,
+)
+Index("idx_room_tiles_asset", RoomTile.tile_asset_id)
