@@ -70,3 +70,8 @@ class Room(Base):
                         nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=False,
                         server_default=func.now(), onupdate=func.now())
+
+
+Index("idx_rooms_room_type", Room.room_type)
+Index("idx_rooms_owner", Room.owner_type, Room.owner_id)
+Index("idx_rooms_is_public", Room.is_public)
