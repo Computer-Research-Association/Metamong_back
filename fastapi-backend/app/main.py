@@ -1,10 +1,13 @@
 from fastapi import FastAPI
+from starlette.middleware.sessions import SessionMiddleware
 
 from app.core.config import settings
 from app.routers import auth
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
+# Authlib 세션 관리
+app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 
 @app.get("/")
 def read_root():
