@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class RoomRole(Enum):
+class RoomRoleType(Enum):
     OWNER = "OWNER"
     EDITOR = "EDITOR"
     VISITOR = "VISITOR"
