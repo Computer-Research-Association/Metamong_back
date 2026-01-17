@@ -19,3 +19,13 @@ def create_access_token(subject: Any, expires_delta: timedelta | None = None) ->
     )
     return encoded_jwt
 
+
+def verify_token(token: str) -> Optional[dict]:
+    try:
+        payload = jwt.decode(
+            token, settings.JWT_SECRET,
+            algorithms=[settings.JWT_ALGORITHM]
+        )
+        return payload
+    except JWTError:
+        return None
