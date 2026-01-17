@@ -114,3 +114,14 @@ class RoomObject(Base):
     object_asset_id = Column(String(100), nullable=False)
 
     room = relationship("Room")
+
+
+Index("idx_room_objects_room_id", RoomObject.room_id)
+Index(
+    "uq_room_objects_position",
+    RoomObject.room_id,
+    RoomObject.x,
+    RoomObject.y,
+    unique=True,
+)
+Index("idx_room_objects_asset", RoomObject.object_asset_id)
