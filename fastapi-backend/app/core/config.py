@@ -19,7 +19,9 @@ class Settings(BaseSettings):
     DATABASE_URL: str = ""
     DB_PASSWORD: str = ""
 
+    # URL
     BACKEND_URL: str = ""
+    FRONTEND_URL: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env"
