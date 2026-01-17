@@ -12,5 +12,11 @@ async def login(provider: str, request: Request):
         raise HTTPException(status_code=404, detail="Invalid provider")
 
     client = oauth.create_client(provider)
+    if client is None:
+        raise HTTPException(
+            status_code=500,
+            detail=f"OAuth client for {provider} is not registered or configured"
+        )
+
     redirect_uri = f"{settings.BACKEND_URL}/api/auth/callback/{provider}"
     return await client.authorize_redirect(request, redirect_uri)
