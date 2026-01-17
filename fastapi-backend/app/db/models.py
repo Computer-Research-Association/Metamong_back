@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
-from app.db.enums import AuthProvider, RC, UserStatus, RoomType, OwnerType, RoomRoleType
+from app.db.enums import AuthProvider, RC, UserStatus, RoomType, OwnerType, RoomRoleType, FriendStatus
 
 
 class User(Base):
@@ -164,3 +164,16 @@ class RoomRole(Base):
 
 
 Index("idx_room_roles_user_id", RoomRole.user_id)
+
+
+class Friend(Base):
+    __tablename__ = "friends"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+
+    user_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
+    friend_user_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
+
+    status = Column(Enum(FriendStatus), nullable=False)
+    created_at = Column(DateTime(timezone=True),
+                        nullable=False, server_default=func.now())
