@@ -1,9 +1,2 @@
 # Docker database data
 postgres_data/
-
-.env
-
-.python-version
-
-# Docker
-docker-compose.yml
