@@ -9,6 +9,8 @@ class RoomRoleType(Enum):
 
 class AuthProvider(Enum):
     GOOGLE = "GOOGLE"
+    NAVER = "NAVER"
+    KAKAO = "KAKAO"
     LOCAL = "LOCAL"
 
 
