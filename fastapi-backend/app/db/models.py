@@ -161,3 +161,6 @@ class RoomRole(Base):
                   )
     created_at = Column(DateTime(timezone=True),
                         nullable=False, server_default=func.now())
+
+
+Index("idx_room_roles_user_id", RoomRole.user_id)
