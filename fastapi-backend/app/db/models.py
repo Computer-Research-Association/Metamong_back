@@ -45,3 +45,6 @@ class Team(Base):
                         nullable=False, server_default=func.now())
 
     owner = relationship("User", back_populates="owned_teams")
+
+
+Index("idx_teams_owner_user_id", Team.owner_user_id)
