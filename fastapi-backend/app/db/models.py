@@ -125,3 +125,16 @@ Index(
     unique=True,
 )
 Index("idx_room_objects_asset", RoomObject.object_asset_id)
+
+
+class RoomPortal(Base):
+    __tablename__ = "room_portals"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+
+    from_room_id = Column(BigInteger, ForeignKey("rooms.id"), nullable=False)
+    from_x = Column(Integer, nullable=False)
+    from_y = Column(Integer, nullable=False)
+
+    to_room_id = Column(BigInteger, ForeignKey("rooms.id"), nullable=False)
+
