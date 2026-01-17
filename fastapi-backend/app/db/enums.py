@@ -10,3 +10,13 @@ class RoomRole(Enum):
 class AuthProvider(Enum):
     GOOGLE = "GOOGLE"
     LOCAL = "LOCAL"
+
+
+class RC(Enum):
+    Torrey = "Torrey"
+    JangGiRyeo = "JangGiRyeo"
+    Kuyper = "Kuyper"
+    SonYangWon = "SonYangWon"
+    Philadelphos = "Philadelphos"
+    Carmichael = "Carmichael"
+
