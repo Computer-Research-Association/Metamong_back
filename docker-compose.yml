@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  # 1. Database (PostgreSQL)
+  db:
+    image: postgres:15-alpine
+    container_name: metaverse-db
+    restart: always
+    environment:
+      POSTGRES_DB: metaverse_db
+      POSTGRES_USER: team_admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD} # .env 또는 GitHub Secrets에서 주입
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data # 데이터 영구 보존
+    networks:
+      - metaverse-network
+
+  # 2. FastAPI Backend
+  fastapi:
+    build:
+      context: ./fastapi-backend
+      dockerfile: Dockerfile
+    container_name: fastapi-app
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://team_admin:${DB_PASSWORD}@db:5432/metaverse_db
+      - JWT_SECRET=${JWT_SECRET}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - metaverse-network
+
+  # 3. Colyseus Real-time Server
+  colyseus:
+    build:
+      context: ./colyseus-server
+      dockerfile: Dockerfile
+    container_name: colyseus-server
+    restart: always
+    environment:
+      - API_URL=http://fastapi:8000
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
+    ports:
+      - "2567:2567"
+    depends_on:
+      - fastapi
+    networks:
+      - metaverse-network
+
+networks:
+  metaverse-network:
+    driver: bridge
