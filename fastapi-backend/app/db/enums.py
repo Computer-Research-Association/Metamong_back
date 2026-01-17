@@ -20,3 +20,8 @@ class RC(Enum):
     Philadelphos = "Philadelphos"
     Carmichael = "Carmichael"
 
+
+class UserStatus(Enum):
+    ACTIVE = "ACTIVE"
+    SUSPENDED = "SUSPENDED"
+    DELETED = "DELETED"
