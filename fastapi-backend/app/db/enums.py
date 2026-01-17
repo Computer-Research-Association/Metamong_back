@@ -37,3 +37,9 @@ class OwnerType(Enum):
     USER = "USER"
     TEAM = "TEAM"
     SYSTEM = "SYSTEM"
+
+
+class FriendStatus(Enum):
+    PENDING = "PENDING"
+    ACCEPTED = "ACCEPTED"
+    BLOCKED = "BLOCKED"
