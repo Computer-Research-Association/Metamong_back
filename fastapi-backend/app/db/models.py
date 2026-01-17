@@ -177,3 +177,13 @@ class Friend(Base):
     status = Column(Enum(FriendStatus), nullable=False)
     created_at = Column(DateTime(timezone=True),
                         nullable=False, server_default=func.now())
+
+
+Index("idx_friends_user_id", Friend.user_id)
+Index("idx_friends_friend_user_id", Friend.friend_user_id)
+Index(
+    "uq_friends_pair",
+    Friend.user_id,
+    Friend.friend_user_id,
+    unique=True,
+)
