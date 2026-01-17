@@ -138,3 +138,12 @@ class RoomPortal(Base):
 
     to_room_id = Column(BigInteger, ForeignKey("rooms.id"), nullable=False)
 
+
+Index("idx_room_portals_from_room", RoomPortal.from_room_id)
+Index("idx_room_portals_to_room", RoomPortal.to_room_id)
+Index(
+    "idx_room_portals_from_position",
+    RoomPortal.from_room_id,
+    RoomPortal.from_x,
+    RoomPortal.from_y,
+)
