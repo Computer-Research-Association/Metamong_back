@@ -14,11 +14,6 @@ def read_root():
     return {"message": "Hello from fastapi-backend!", "version": "3.11"}
 
 
-@app.get("/db-test")
-def test_db(db: Session = Depends(get_db)):
-    return {"message": "DB connection successful"}
-
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
