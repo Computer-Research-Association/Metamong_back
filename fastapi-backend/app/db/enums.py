@@ -6,3 +6,7 @@ class RoomRole(Enum):
     EDITOR = "EDITOR"
     VISITOR = "VISITOR"
 
+
+class AuthProvider(Enum):
+    GOOGLE = "GOOGLE"
+    LOCAL = "LOCAL"
