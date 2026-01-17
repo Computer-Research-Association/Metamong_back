@@ -15,7 +15,7 @@ async def login(provider: str, request: Request):
     if client is None:
         raise HTTPException(
             status_code=500,
-            detail=f"OAuth client for {provider} is not registered or configured"
+            detail=f"OAuth client for {provider} is not configured"
         )
 
     redirect_uri = f"{settings.BACKEND_URL}/api/auth/callback/{provider}"
