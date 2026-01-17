@@ -1,13 +1,31 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, BigInteger, String, DateTime, Integer, Enum, ForeignKey, Index
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from app.db.database import Base
+
+from app.db.enums import AuthProvider, RC, UserStatus
 
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True, nullable=True)
-    is_active = Column(Boolean, default=True)
+    id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
+    email = Column(String(255), unique=True, nullable=True)
+    nickname = Column(String(50), nullable=False)
+    real_name = Column(String(50), nullable=False)
+
+    password_hash = Column(String(255))
+    auth_provider = Column(Enum(AuthProvider), nullable=False)
+
+    rc = Column(Enum(RC), nullable=False)
+    status = Column(Enum(UserStatus), nullable=False,
+                    default=UserStatus.ACTIVE)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    last_login_at = Column(DateTime(timezone=True))
+
+    last_room_id = Column(BigInteger, ForeignKey("rooms.id"))
+    last_room_x = Column(Integer)
+    last_room_y = Column(Integer)
+
+    owned_teams = relationship("Team", back_populates="owner")
+
