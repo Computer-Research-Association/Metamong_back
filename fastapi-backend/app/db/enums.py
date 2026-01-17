@@ -25,3 +25,9 @@ class UserStatus(Enum):
     ACTIVE = "ACTIVE"
     SUSPENDED = "SUSPENDED"
     DELETED = "DELETED"
+
+
+class RoomType(Enum):
+    GENERAL = "GENERAL"
+    CUSTOM = "CUSTOM"
+    BUILDING = "BUILDING"
