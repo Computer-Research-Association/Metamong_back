@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Optional, List
 from datetime import datetime
 
-from sqlalchemy import Column, BigInteger, String, DateTime, Integer, SAEnum, ForeignKey, Index, Boolean
+from sqlalchemy import Column, BigInteger, String, DateTime, Integer, Enum as SAEnum, ForeignKey, Index, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
