@@ -10,6 +10,8 @@ services:
       POSTGRES_DB: metaverse_db
       POSTGRES_USER: team_admin
       POSTGRES_PASSWORD: ${DB_PASSWORD} # .env 또는 GitHub Secrets에서 주입
+    ports:
+      - "5432:5432"
     volumes:
       - ./postgres_data:/var/lib/postgresql/data # 데이터 영구 보존
     networks:
