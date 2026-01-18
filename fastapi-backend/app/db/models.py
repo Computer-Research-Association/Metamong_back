@@ -1,6 +1,7 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, List
+from datetime import datetime
 
-from sqlalchemy import Column, BigInteger, String, DateTime, Integer, Enum, ForeignKey, Index, Boolean
+from sqlalchemy import Column, BigInteger, String, DateTime, Integer, SAEnum, ForeignKey, Index, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
@@ -13,26 +14,39 @@ if TYPE_CHECKING:
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
-    email = Column(String(255), unique=True, nullable=True)
-    nickname = Column(String(50), nullable=False)
-    real_name = Column(String(50), nullable=False)
 
-    password_hash = Column(String(255))
-    auth_provider = Column(Enum(AuthProvider), nullable=False)
+    id: Mapped[int] = mapped_column(
+        BigInteger, primary_key=True, index=True, autoincrement=True)
+    email: Mapped[Optional[str]] = mapped_column(
+        String(255), unique=True, nullable=True)
+    nickname: Mapped[str] = mapped_column(String(50))
+    real_name: Mapped[str] = mapped_column(String(50))
 
-    rc = Column(Enum(RC), nullable=False)
-    status = Column(Enum(UserStatus), nullable=False,
-                    default=UserStatus.ACTIVE)
+    password_hash: Mapped[Optional[str]] = mapped_column(
+        String(255), nullable=True)
+    auth_provider: Mapped[AuthProvider] = mapped_column(SAEnum(AuthProvider))
 
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    last_login_at = Column(DateTime(timezone=True))
+    rc: Mapped[RC] = mapped_column(SAEnum(RC))
+    status: Mapped[UserStatus] = mapped_column(
+        SAEnum(UserStatus),
+        default=UserStatus.ACTIVE,
+        server_default=UserStatus.ACTIVE.value
+    )
 
-    last_room_id = Column(BigInteger, ForeignKey("rooms.id"))
-    last_room_x = Column(Integer)
-    last_room_y = Column(Integer)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now()
+    )
+    last_login_at: Mapped[Optional[datetime]
+                          ] = mapped_column(DateTime(timezone=True))
 
-    owned_teams = relationship("Team", back_populates="owner")
+    last_room_id: Mapped[Optional[int]] = mapped_column(
+        BigInteger, ForeignKey("rooms.id"))
+    last_room_x: Mapped[Optional[int]] = mapped_column(Integer)
+    last_room_y: Mapped[Optional[int]] = mapped_column(Integer)
+
+    owned_teams: Mapped[List["Team"]] = relationship(
+        "Team", back_populates="owner")
 
 
 Index("idx_users_auth_provider", User.auth_provider)
@@ -59,10 +73,10 @@ class Room(Base):
     __tablename__ = "rooms"
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    room_type = Column(Enum(RoomType), nullable=False)
+    room_type = Column(SAEnum(RoomType), nullable=False)
     name = Column(String(50), nullable=False)
 
-    owner_type = Column(Enum(OwnerType), nullable=False)
+    owner_type = Column(SAEnum(OwnerType), nullable=False)
     owner_id = Column(BigInteger)
 
     is_public = Column(Boolean, nullable=False, default=False)
@@ -160,7 +174,7 @@ class RoomRole(Base):
     room_id = Column(BigInteger, ForeignKey("rooms.id"), primary_key=True)
     user_id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
 
-    role = Column(Enum(RoomRoleType),
+    role = Column(SAEnum(RoomRoleType),
                   nullable=False,
                   default=RoomRoleType.VISITOR
                   )
@@ -179,7 +193,7 @@ class Friend(Base):
     user_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
     friend_user_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
 
-    status = Column(Enum(FriendStatus), nullable=False)
+    status = Column(SAEnum(FriendStatus), nullable=False)
     created_at = Column(DateTime(timezone=True),
                         nullable=False, server_default=func.now())
 
