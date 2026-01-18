@@ -1,9 +1,14 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Column, BigInteger, String, DateTime, Integer, Enum, ForeignKey, Index, Boolean
 from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship
-from app.db.database import Base
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
+from app.db.database import Base
 from app.db.enums import AuthProvider, RC, UserStatus, RoomType, OwnerType, RoomRoleType, FriendStatus
+
+if TYPE_CHECKING:
+    from app.db.models import Team
 
 
 class User(Base):
