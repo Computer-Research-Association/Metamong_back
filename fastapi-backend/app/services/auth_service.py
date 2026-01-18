@@ -43,9 +43,7 @@ class AuthService:
             )
             self.db.add(user)
         else:
-            # TODO : 런타임에는 정상적으로 동작하지만, Column[datetime] 타입과의 불일치로 인한 문제 해결 (Pylance)
-            # last_login_at 의 타입힌트
-            user.last_login_at = datetime.now(timezone.utc)  # type: ignore
+            user.last_login_at = datetime.now(timezone.utc)
 
         self.db.commit()
         self.db.refresh(user)
