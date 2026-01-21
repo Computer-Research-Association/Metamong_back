@@ -45,6 +45,13 @@ class User(Base):
     last_room_x: Mapped[Optional[int]] = mapped_column(Integer)
     last_room_y: Mapped[Optional[int]] = mapped_column(Integer)
 
+    # 추가 필드
+    student_id: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    major: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    phone_number: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    instagram_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    mbti: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+
     owned_teams: Mapped[List["Team"]] = relationship(
         "Team", back_populates="owner")
 
