@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Optional, List
 from datetime import datetime
 
-from sqlalchemy import Column, BigInteger, String, DateTime, Integer, Enum as SAEnum, ForeignKey, Index, Boolean
+from sqlalchemy import BigInteger, String, DateTime, Integer, Enum as SAEnum, ForeignKey, Index, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
@@ -56,14 +56,18 @@ Index("idx_users_last_room_id", User.last_room_id)
 class Team(Base):
     __tablename__ = "teams"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
-    name = Column(String(50), nullable=False, unique=True)
+    id: Mapped[int] = mapped_column(
+        BigInteger, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(
+        String(50), nullable=False, unique=True)
 
-    owner_user_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
-    created_at = Column(DateTime(timezone=True),
-                        nullable=False, server_default=func.now())
+    owner_user_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("users.id"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False, server_default=func.now())
 
-    owner = relationship("User", back_populates="owned_teams")
+    owner: Mapped["User"] = relationship("User", back_populates="owned_teams")
 
 
 Index("idx_teams_owner_user_id", Team.owner_user_id)
@@ -72,23 +76,26 @@ Index("idx_teams_owner_user_id", Team.owner_user_id)
 class Room(Base):
     __tablename__ = "rooms"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
-    room_type = Column(SAEnum(RoomType), nullable=False)
-    name = Column(String(50), nullable=False)
+    id: Mapped[int] = mapped_column(
+        BigInteger, primary_key=True, autoincrement=True)
+    room_type: Mapped[RoomType] = mapped_column(SAEnum(RoomType), nullable=False)
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
 
-    owner_type = Column(SAEnum(OwnerType), nullable=False)
-    owner_id = Column(BigInteger)
+    owner_type: Mapped[OwnerType] = mapped_column(SAEnum(OwnerType), nullable=False)
+    owner_id: Mapped[Optional[int]] = mapped_column(BigInteger)
 
-    is_public = Column(Boolean, nullable=False, default=False)
-    password_hash = Column(String(255))
+    is_public: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    password_hash: Mapped[Optional[str]] = mapped_column(String(255))
 
-    width = Column(Integer, nullable=False)
-    height = Column(Integer, nullable=False)
+    width: Mapped[int] = mapped_column(Integer, nullable=False)
+    height: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    created_at = Column(DateTime(timezone=True),
-                        nullable=False, server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), nullable=False,
-                        server_default=func.now(), onupdate=func.now())
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False,
+        server_default=func.now(), onupdate=func.now())
 
 
 Index("idx_rooms_room_type", Room.room_type)
@@ -99,15 +106,17 @@ Index("idx_rooms_is_public", Room.is_public)
 class RoomTile(Base):
     __tablename__ = "room_tiles"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
-    room_id = Column(BigInteger, ForeignKey("rooms.id"), nullable=False)
+    id: Mapped[int] = mapped_column(
+        BigInteger, primary_key=True, autoincrement=True)
+    room_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("rooms.id"), nullable=False)
 
-    x = Column(Integer, nullable=False)
-    y = Column(Integer, nullable=False)
+    x: Mapped[int] = mapped_column(Integer, nullable=False)
+    y: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    tile_asset_id = Column(BigInteger, nullable=False)
+    tile_asset_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
 
-    room = relationship("Room")
+    room: Mapped["Room"] = relationship("Room")
 
 
 Index("idx_room_tiles_room_id", RoomTile.room_id)
@@ -124,15 +133,17 @@ Index("idx_room_tiles_asset", RoomTile.tile_asset_id)
 class RoomObject(Base):
     __tablename__ = "room_objects"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
-    room_id = Column(BigInteger, ForeignKey("rooms.id"), nullable=False)
+    id: Mapped[int] = mapped_column(
+        BigInteger, primary_key=True, autoincrement=True)
+    room_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("rooms.id"), nullable=False)
 
-    x = Column(Integer, nullable=False)
-    y = Column(Integer, nullable=False)
+    x: Mapped[int] = mapped_column(Integer, nullable=False)
+    y: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    object_asset_id = Column(String(100), nullable=False)
+    object_asset_id: Mapped[str] = mapped_column(String(100), nullable=False)
 
-    room = relationship("Room")
+    room: Mapped["Room"] = relationship("Room")
 
 
 Index("idx_room_objects_room_id", RoomObject.room_id)
@@ -149,13 +160,16 @@ Index("idx_room_objects_asset", RoomObject.object_asset_id)
 class RoomPortal(Base):
     __tablename__ = "room_portals"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(
+        BigInteger, primary_key=True, autoincrement=True)
 
-    from_room_id = Column(BigInteger, ForeignKey("rooms.id"), nullable=False)
-    from_x = Column(Integer, nullable=False)
-    from_y = Column(Integer, nullable=False)
+    from_room_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("rooms.id"), nullable=False)
+    from_x: Mapped[int] = mapped_column(Integer, nullable=False)
+    from_y: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    to_room_id = Column(BigInteger, ForeignKey("rooms.id"), nullable=False)
+    to_room_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("rooms.id"), nullable=False)
 
 
 Index("idx_room_portals_from_room", RoomPortal.from_room_id)
@@ -171,15 +185,19 @@ Index(
 class RoomRole(Base):
     __tablename__ = "room_roles"
 
-    room_id = Column(BigInteger, ForeignKey("rooms.id"), primary_key=True)
-    user_id = Column(BigInteger, ForeignKey("users.id"), primary_key=True)
+    room_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("rooms.id"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("users.id"), primary_key=True)
 
-    role = Column(SAEnum(RoomRoleType),
-                  nullable=False,
-                  default=RoomRoleType.VISITOR
-                  )
-    created_at = Column(DateTime(timezone=True),
-                        nullable=False, server_default=func.now())
+    role: Mapped[RoomRoleType] = mapped_column(
+        SAEnum(RoomRoleType),
+        nullable=False,
+        default=RoomRoleType.VISITOR
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False, server_default=func.now())
 
 
 Index("idx_room_roles_user_id", RoomRole.user_id)
@@ -188,14 +206,18 @@ Index("idx_room_roles_user_id", RoomRole.user_id)
 class Friend(Base):
     __tablename__ = "friends"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(
+        BigInteger, primary_key=True, autoincrement=True)
 
-    user_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
-    friend_user_id = Column(BigInteger, ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("users.id"), nullable=False)
+    friend_user_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("users.id"), nullable=False)
 
-    status = Column(SAEnum(FriendStatus), nullable=False)
-    created_at = Column(DateTime(timezone=True),
-                        nullable=False, server_default=func.now())
+    status: Mapped[FriendStatus] = mapped_column(SAEnum(FriendStatus), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False, server_default=func.now())
 
 
 Index("idx_friends_user_id", Friend.user_id)
