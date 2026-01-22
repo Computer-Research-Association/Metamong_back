@@ -6,7 +6,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from app.db.database import Base
-from app.db.enums import AuthProvider, RC, UserStatus, RoomType, OwnerType, RoomRoleType, FriendStatus
+from app.db.enums import AuthProvider, RC, UserStatus, RoomType, OwnerType, RoomRoleType, FriendStatus, MBTI
 
 if TYPE_CHECKING:
     from app.db.models import Team
@@ -50,7 +50,7 @@ class User(Base):
     major: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     phone_number: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     instagram_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
-    mbti: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    mbti: Mapped[Optional[MBTI]] = mapped_column(SAEnum(MBTI), nullable=True)
 
     owned_teams: Mapped[List["Team"]] = relationship(
         "Team", back_populates="owner")
