@@ -1,8 +1,8 @@
-"""Initial schema
+"""initial schema with all features
 
-Revision ID: 618f6192ec6a
+Revision ID: e3136d1ae3bd
 Revises: 
-Create Date: 2026-01-17 20:25:52.647684
+Create Date: 2026-01-22 16:16:27.388684
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '618f6192ec6a'
+revision: str = 'e3136d1ae3bd'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -81,14 +81,19 @@ def upgrade() -> None:
     sa.Column('nickname', sa.String(length=50), nullable=False),
     sa.Column('real_name', sa.String(length=50), nullable=False),
     sa.Column('password_hash', sa.String(length=255), nullable=True),
-    sa.Column('auth_provider', sa.Enum('GOOGLE', 'LOCAL', name='authprovider'), nullable=False),
+    sa.Column('auth_provider', sa.Enum('GOOGLE', 'NAVER', 'KAKAO', 'LOCAL', name='authprovider'), nullable=False),
     sa.Column('rc', sa.Enum('Torrey', 'JangGiRyeo', 'Kuyper', 'SonYangWon', 'Philadelphos', 'Carmichael', name='rc'), nullable=False),
-    sa.Column('status', sa.Enum('ACTIVE', 'SUSPENDED', 'DELETED', name='userstatus'), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+    sa.Column('status', sa.Enum('ACTIVE', 'SUSPENDED', 'DELETED', 'NEW', 'GUEST', name='userstatus'), server_default='ACTIVE', nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('last_login_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('last_room_id', sa.BigInteger(), nullable=True),
     sa.Column('last_room_x', sa.Integer(), nullable=True),
     sa.Column('last_room_y', sa.Integer(), nullable=True),
+    sa.Column('student_id', sa.String(length=50), nullable=True),
+    sa.Column('major', sa.String(length=100), nullable=True),
+    sa.Column('phone_number', sa.String(length=20), nullable=True),
+    sa.Column('instagram_id', sa.String(length=100), nullable=True),
+    sa.Column('mbti', sa.Enum('ISTJ', 'ISFJ', 'INFJ', 'INTJ', 'ISTP', 'ISFP', 'INFP', 'INTP', 'ESTP', 'ESFP', 'ENFP', 'ENTP', 'ESTJ', 'ESFJ', 'ENFJ', 'ENTJ', name='mbti'), nullable=True),
     sa.ForeignKeyConstraint(['last_room_id'], ['rooms.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
