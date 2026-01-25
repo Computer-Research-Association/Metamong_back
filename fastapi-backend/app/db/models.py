@@ -18,7 +18,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(
         BigInteger, primary_key=True, index=True, autoincrement=True)
     email: Mapped[Optional[str]] = mapped_column(
-        String(255), unique=True, nullable=True)
+        String(255), nullable=True)
     nickname: Mapped[str] = mapped_column(String(50))
     real_name: Mapped[str] = mapped_column(String(50))
 
@@ -46,10 +46,13 @@ class User(Base):
     last_room_y: Mapped[Optional[int]] = mapped_column(Integer)
 
     # 추가 필드
-    student_id: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    student_id: Mapped[Optional[str]] = mapped_column(
+        String(50), nullable=True)
     major: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
-    phone_number: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
-    instagram_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    phone_number: Mapped[Optional[str]] = mapped_column(
+        String(20), nullable=True)
+    instagram_id: Mapped[Optional[str]] = mapped_column(
+        String(100), nullable=True)
     mbti: Mapped[Optional[MBTI]] = mapped_column(SAEnum(MBTI), nullable=True)
 
     owned_teams: Mapped[List["Team"]] = relationship(
@@ -58,6 +61,8 @@ class User(Base):
 
 Index("idx_users_auth_provider", User.auth_provider)
 Index("idx_users_last_room_id", User.last_room_id)
+Index("uq_users_email_auth_provider", User.email,
+      User.auth_provider, unique=True)
 
 
 class Team(Base):
@@ -85,13 +90,16 @@ class Room(Base):
 
     id: Mapped[int] = mapped_column(
         BigInteger, primary_key=True, autoincrement=True)
-    room_type: Mapped[RoomType] = mapped_column(SAEnum(RoomType), nullable=False)
+    room_type: Mapped[RoomType] = mapped_column(
+        SAEnum(RoomType), nullable=False)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
 
-    owner_type: Mapped[OwnerType] = mapped_column(SAEnum(OwnerType), nullable=False)
+    owner_type: Mapped[OwnerType] = mapped_column(
+        SAEnum(OwnerType), nullable=False)
     owner_id: Mapped[Optional[int]] = mapped_column(BigInteger)
 
-    is_public: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    is_public: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False)
     password_hash: Mapped[Optional[str]] = mapped_column(String(255))
 
     width: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -221,7 +229,8 @@ class Friend(Base):
     friend_user_id: Mapped[int] = mapped_column(
         BigInteger, ForeignKey("users.id"), nullable=False)
 
-    status: Mapped[FriendStatus] = mapped_column(SAEnum(FriendStatus), nullable=False)
+    status: Mapped[FriendStatus] = mapped_column(
+        SAEnum(FriendStatus), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False, server_default=func.now())
