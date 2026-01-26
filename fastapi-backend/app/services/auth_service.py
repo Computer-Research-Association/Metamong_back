@@ -30,14 +30,18 @@ class AuthService:
         if not email:
             raise ValueError("Email not found.")
 
-        user = self.db.query(User).filter(User.email == email).first()
+        auth_provider = AuthProvider[provider.upper()]
+        user = self.db.query(User).filter(
+            User.email == email,
+            User.auth_provider == auth_provider
+        ).first()
 
         if not user:
             user = User(
                 email=email,
                 nickname=user_data.get("nickname"),
                 real_name=user_data.get("name"),
-                auth_provider=AuthProvider[provider.upper()],
+                auth_provider=auth_provider,
                 rc=RC.Torrey,
                 status=UserStatus.ACTIVE
             )
