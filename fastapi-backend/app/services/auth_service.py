@@ -43,7 +43,7 @@ class AuthService:
                 nickname=user_data.get("nickname"),
                 real_name=user_data.get("name"),
                 auth_provider=auth_provider,
-                rc=RC.Torrey,
+                rc=RC.UNASSIGNED,  # 초기화 전 기본값
                 status=UserStatus.NEW
             )
             self.db.add(user)

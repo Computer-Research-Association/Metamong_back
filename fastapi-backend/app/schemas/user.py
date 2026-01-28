@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 
-from app.db.enums import AuthProvider, RC, UserStatus
+from app.db.enums import AuthProvider, RC, UserStatus, MBTI
 
 
 class UserResponse(BaseModel):
@@ -19,3 +19,11 @@ class UserResponse(BaseModel):
 
 class RCUpdate(BaseModel):
     rc: RC
+
+
+class InitializeUserInfo(BaseModel):
+    student_id: Optional[str] = None
+    major: Optional[str] = None
+    phone_number: Optional[str] = None
+    instagram_id: Optional[str] = None
+    mbti: Optional[MBTI] = None
