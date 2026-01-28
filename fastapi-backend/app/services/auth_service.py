@@ -37,16 +37,18 @@ class AuthService:
         ).first()
 
         if not user:
+            # 새 유저 (처음 로그인) → NEW 상태로 생성
             user = User(
                 email=email,
                 nickname=user_data.get("nickname"),
                 real_name=user_data.get("name"),
                 auth_provider=auth_provider,
-                rc=RC.Torrey,
-                status=UserStatus.ACTIVE
+                rc=RC.UNASSIGNED,  # 초기화 전 기본값
+                status=UserStatus.NEW
             )
             self.db.add(user)
         else:
+            # 기존 유저 (이전에 로그인했던) → ACTIVE 유지
             user.last_login_at = datetime.now(timezone.utc)
 
         self.db.commit()

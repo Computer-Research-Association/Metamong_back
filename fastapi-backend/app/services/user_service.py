@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 
 from app.db.models import User
-from app.db.enums import RC
+from app.db.enums import RC, UserStatus
+from app.schemas.user import InitializeUserInfo
 
 
 class UserService:
@@ -12,4 +13,29 @@ class UserService:
         user.rc = new_rc
         self.db.commit()
         self.db.refresh(user)
+        return user
+
+    def initialize_user_info(self, user: User, init_data: InitializeUserInfo) -> User:
+        # NEW 유저만 초기화 처리
+        if user.status == UserStatus.NEW:
+            # 필드 업데이트 (UNASSIGNED → 실제 RC)
+            user.rc = init_data.rc  # 필수 필드이므로 항상 업데이트
+            if init_data.student_id is not None:
+                user.student_id = init_data.student_id
+            if init_data.major is not None:
+                user.major = init_data.major
+            if init_data.phone_number is not None:
+                user.phone_number = init_data.phone_number
+            if init_data.instagram_id is not None:
+                user.instagram_id = init_data.instagram_id
+            if init_data.mbti is not None:
+                user.mbti = init_data.mbti
+
+            # NEW → ACTIVE로 변경
+            user.status = UserStatus.ACTIVE
+
+            self.db.commit()
+            self.db.refresh(user)
+        
+        # ACTIVE 유저는 그냥 현재 유저 정보 반환 (변경 없음)
         return user

@@ -15,6 +15,7 @@ class AuthProvider(Enum):
 
 
 class RC(Enum):
+    UNASSIGNED = "UNASSIGNED"  # 초기화 전 기본값
     Torrey = "Torrey"
     JangGiRyeo = "JangGiRyeo"
     Kuyper = "Kuyper"
