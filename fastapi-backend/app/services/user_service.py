@@ -16,7 +16,8 @@ class UserService:
         return user
 
     def initialize_user_info(self, user: User, init_data: InitializeUserInfo) -> User:
-        # 필드 업데이트
+        # 필드 업데이트 (UNASSIGNED → 실제 RC)
+        user.rc = init_data.rc  # 필수 필드이므로 항상 업데이트
         if init_data.student_id is not None:
             user.student_id = init_data.student_id
         if init_data.major is not None:

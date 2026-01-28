@@ -12,6 +12,11 @@ class UserResponse(BaseModel):
     auth_provider: AuthProvider
     rc: RC
     status: UserStatus
+    student_id: Optional[str] = None
+    major: Optional[str] = None
+    phone_number: Optional[str] = None
+    instagram_id: Optional[str] = None
+    mbti: Optional[MBTI] = None
 
     class Config:
         from_attributes = True
@@ -22,6 +27,7 @@ class RCUpdate(BaseModel):
 
 
 class InitializeUserInfo(BaseModel):
+    rc: RC  # 필수(초기화 시 반드시 선택하도록)
     student_id: Optional[str] = None
     major: Optional[str] = None
     phone_number: Optional[str] = None
