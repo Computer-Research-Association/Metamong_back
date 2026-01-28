@@ -33,12 +33,6 @@ async def initialize_user_info(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # NEW 상태인지 확인
-    if current_user.status != UserStatus.NEW:
-        raise HTTPException(
-            status_code=400, detail="User is already initialized"
-        )
-
     user_service = UserService(db)
     updated_user = user_service.initialize_user_info(current_user, init_data)
     return updated_user
