@@ -20,7 +20,7 @@ class Settings(BaseSettings):
 
     # URL
     BACKEND_URL: str = ""
-    FRONTEND_URL: str = ""
+    FRONTEND_URL: str = "" # Unity WEBGL 빌드가 호스팅 될 도메인
 
     model_config = SettingsConfigDict(
         env_file=".env"
