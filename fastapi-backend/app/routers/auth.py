@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException, Depends
 from sqlalchemy.orm import Session
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 
 from app.core.oauth import oauth
 from app.core.config import settings
@@ -43,10 +43,61 @@ async def auth_callback(provider: str, request: Request, db: Session = Depends(g
         user_data = await auth_service.get_user_info(provider, client, token)
         access_token = await auth_service.login(provider, user_data)
 
-        redirect_url = f"{settings.FRONTEND_URL}/auth/callback?token={access_token}"
-        return RedirectResponse(url=redirect_url)
-
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Login Success</title>
+        </head>
+        <body>
+            <h2>로그인 성공!</h2>
+            <p>잠시 후 게임으로 돌아갑니다...</p>
+            <script>
+                if (window.opener) {{
+                    window.opener.postMessage({{
+                        type: 'oauth_success',
+                        token: '{access_token}'
+                    }}, '{settings.FRONTEND_URL}');
+                    window.close();
+                }} else {{
+                    window.location.href = '{settings.FRONTEND_URL}/auth/callback?token={access_token}';
+                }}
+            </script>
+        </body>
+        </html>
+        """
+        return HTMLResponse(content=html_content)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        return HTMLResponse(content=f"""
+        <!DOCTYPE html>
+        <html>
+        <body>
+            <script>
+                if (window.opener) {{
+                    window.opener.postMessage({{
+                        type: 'oauth_error',
+                        error: '{str(e)}'
+                    }}, '{settings.FRONTEND_URL}');
+                    window.close();
+                }}
+            </script>
+        </body>
+        </html>
+        """)
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Login failed: Unknown")
+        return HTMLResponse(content=f"""
+        <!DOCTYPE html>
+        <html>
+        <body>
+            <script>
+                if (window.opener) {{
+                    window.opener.postMessage({{
+                        type: 'oauth_error',
+                        error: 'Login failed'
+                    }}, '{settings.FRONTEND_URL}');
+                    window.close();
+                }}
+            </script>
+        </body>
+        </html>
+        """)
