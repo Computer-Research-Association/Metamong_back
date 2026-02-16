@@ -5,8 +5,12 @@ import { playground } from "@colyseus/playground";
 /**
  * Import your Room files
  */
+
+export const ServerGlobal = {
+    publicKey: ""
+};
+
 import { MyRoom } from "./rooms/MyRoom";
-import { Handong } from "./rooms/Handong";
 
 export default config({
 
@@ -14,6 +18,19 @@ export default config({
         /**
          * Define your room handlers:
          */
+        //맨 처음 stateful 서버 시작될 때, api, env, pem 등으로부터 server의 public key를 가져올 것
+        /*try {
+            console.log("requesting public-key from stateless server");
+            const response = await axios.get("https://your-auth-server.com/api/public-key");
+            
+            // API 응답 구조에 맞춰 수정
+            ServerGlobal.publicKey = response.data; 
+            
+            console.log("public-key loaded");
+        } catch (error) {
+            console.error("failed to load public-key");
+            process.exit(1); 
+        }*/
         gameServer.define('my_room', MyRoom);
 
     },
