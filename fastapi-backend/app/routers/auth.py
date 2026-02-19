@@ -43,7 +43,7 @@ async def auth_callback(provider: str, request: Request, db: Session = Depends(g
         user_data = await auth_service.get_user_info(provider, client, token)
         access_token = await auth_service.login(provider, user_data)
 
-        redirect_url = f"{settings.FRONTEND_URL}/auth/callback?token={access_token}"
+        redirect_url = f"{settings.FRONTEND_URL}?token={access_token}"
         return RedirectResponse(url=redirect_url)
 
     except ValueError as e:
