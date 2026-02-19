@@ -1,11 +1,45 @@
 import { Room, Client } from "@colyseus/core";
 import { MyRoomState, Player } from "./schema/MyRoomState";
+import * as jwt from "jsonwebtoken";
+import { ServerGlobal } from "../app.config";
 
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
 
+
+  /*
+  방에 들어올 때 이 함수가 실행되므로
+  유니티에서 client.JoinOrCreate("room_name", options) 이 함수를 실행할 때, option에 jwt를 넣을 것
+  */
+  async onAuth(client: Client, options: any, request?: any) {
+    const token = options.token;
+
+    if (!token) {
+      console.error("token not find");
+      return false;
+    }
+
+    try {
+      const decoded = jwt.verify(token, ServerGlobal.publicKey, {
+        algorithms: ["RS256"],
+      }) as any;
+
+      //todo: jwt payload에 뭘 넣을지에 따라 달라져야함
+      return {
+        userId: decoded.sub,
+        nickname: decoded.nickname,
+        role: decoded.role
+      };
+    } catch (err) {
+      const errorMessage = (err instanceof Error) ? err.message : "Unknown Error";
+      console.error("Authentication failed:", errorMessage);
+      return false;
+    }
+  }
+
   onCreate (options: any) {
-    this.setState(new MyRoomState());
+    //this.setState(new MyRoomState()); < 이 표현 방식은 deprecated됨
+    this.state = new MyRoomState();
 
     this.onMessage("input", (client, input) => {
       const player = this.state.players.get(client.sessionId);
