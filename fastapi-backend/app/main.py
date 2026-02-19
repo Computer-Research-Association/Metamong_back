@@ -12,7 +12,9 @@ app.add_middleware(
     allow_origins=[
         settings.FRONTEND_URL,
         "http://localhost:3000",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "https://your-unity-app.com",  # Placeholder for production frontend
     ],
     allow_credentials=True,
     allow_methods=["*"],
