@@ -6,8 +6,22 @@ from app.core.oauth import oauth
 from app.core.config import settings
 from app.db.database import get_db
 from app.services.auth_service import AuthService
+from app.schemas.auth import SymmetricKeyResponse
 
 router = APIRouter()
+
+
+@router.get("/key", response_model=SymmetricKeyResponse)
+async def get_symmetric_key():
+    """
+    토큰 검증용 대칭키를 응답 body로 리턴함
+    """
+    if not settings.JWT_SECRET:
+        raise HTTPException(status_code=500, detail="JWT secret not configured")
+    return SymmetricKeyResponse(
+        key=settings.JWT_SECRET,
+        algorithm=settings.JWT_ALGORITHM,
+    )
 
 
 @router.get("/login/{provider}")
