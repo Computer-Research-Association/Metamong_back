@@ -5,6 +5,12 @@ from app.db.database import get_db
 from app.db.models import User
 from app.dependencies.auth import get_current_user
 from app.schemas.room_layout import (
+    PatchObjectsRequest,
+    PatchObjectsResponse,
+    PatchPortalsRequest,
+    PatchPortalsResponse,
+    PatchTilesRequest,
+    PatchTilesResponse,
     ReplaceObjectsRequest,
     ReplaceObjectsResponse,
     ReplacePortalsRequest,
@@ -108,6 +114,19 @@ async def replace_room_tiles(
     return ReplaceTilesResponse(room_id=room_id, tiles=tiles)
 
 
+@router.patch("/{room_id}/tiles", response_model=PatchTilesResponse)
+# 룸 타일 부분 수정 API
+async def patch_room_tiles(
+    room_id: int,
+    request_data: PatchTilesRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    room_layout_service = RoomLayoutService(db)
+    tiles = room_layout_service.patch_tiles(room_id, current_user, request_data)
+    return PatchTilesResponse(room_id=room_id, tiles=tiles)
+
+
 @router.put("/{room_id}/objects", response_model=ReplaceObjectsResponse)
 # 룸 오브젝트 일괄 교체 API
 async def replace_room_objects(
@@ -121,6 +140,19 @@ async def replace_room_objects(
     return ReplaceObjectsResponse(room_id=room_id, objects=objects)
 
 
+@router.patch("/{room_id}/objects", response_model=PatchObjectsResponse)
+# 룸 오브젝트 부분 수정 API
+async def patch_room_objects(
+    room_id: int,
+    request_data: PatchObjectsRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    room_layout_service = RoomLayoutService(db)
+    objects = room_layout_service.patch_objects(room_id, current_user, request_data)
+    return PatchObjectsResponse(room_id=room_id, objects=objects)
+
+
 @router.put("/{room_id}/portals", response_model=ReplacePortalsResponse)
 # 룸 포탈 일괄 교체 API
 async def replace_room_portals(
@@ -132,3 +164,16 @@ async def replace_room_portals(
     room_layout_service = RoomLayoutService(db)
     portals = room_layout_service.replace_portals(room_id, current_user, request_data)
     return ReplacePortalsResponse(room_id=room_id, portals=portals)
+
+
+@router.patch("/{room_id}/portals", response_model=PatchPortalsResponse)
+# 룸 포탈 부분 수정 API
+async def patch_room_portals(
+    room_id: int,
+    request_data: PatchPortalsRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    room_layout_service = RoomLayoutService(db)
+    portals = room_layout_service.patch_portals(room_id, current_user, request_data)
+    return PatchPortalsResponse(room_id=room_id, portals=portals)

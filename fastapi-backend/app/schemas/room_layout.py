@@ -21,6 +21,16 @@ class RoomPortalPayload(BaseModel):
     to_room_id: int
 
 
+class GridPosition(BaseModel):
+    x: int = Field(ge=0)
+    y: int = Field(ge=0)
+
+
+class PortalPosition(BaseModel):
+    from_x: int = Field(ge=0)
+    from_y: int = Field(ge=0)
+
+
 class ReplaceTilesRequest(BaseModel):
     tiles: List[RoomTilePayload]
 
@@ -31,6 +41,21 @@ class ReplaceObjectsRequest(BaseModel):
 
 class ReplacePortalsRequest(BaseModel):
     portals: List[RoomPortalPayload]
+
+
+class PatchTilesRequest(BaseModel):
+    upserts: List[RoomTilePayload] = Field(default_factory=list)
+    removes: List[GridPosition] = Field(default_factory=list)
+
+
+class PatchObjectsRequest(BaseModel):
+    upserts: List[RoomObjectPayload] = Field(default_factory=list)
+    removes: List[GridPosition] = Field(default_factory=list)
+
+
+class PatchPortalsRequest(BaseModel):
+    upserts: List[RoomPortalPayload] = Field(default_factory=list)
+    removes: List[PortalPosition] = Field(default_factory=list)
 
 
 class RoomLayoutResponse(BaseModel):
@@ -53,5 +78,20 @@ class ReplaceObjectsResponse(BaseModel):
 
 
 class ReplacePortalsResponse(BaseModel):
+    room_id: int
+    portals: List[RoomPortalPayload]
+
+
+class PatchTilesResponse(BaseModel):
+    room_id: int
+    tiles: List[RoomTilePayload]
+
+
+class PatchObjectsResponse(BaseModel):
+    room_id: int
+    objects: List[RoomObjectPayload]
+
+
+class PatchPortalsResponse(BaseModel):
     room_id: int
     portals: List[RoomPortalPayload]

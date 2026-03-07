@@ -6,6 +6,9 @@ from sqlalchemy.orm import Session
 from app.db.enums import OwnerType
 from app.db.models import Room, RoomObject, RoomPortal, RoomTile, User
 from app.schemas.room_layout import (
+    PatchObjectsRequest,
+    PatchPortalsRequest,
+    PatchTilesRequest,
     ReplaceObjectsRequest,
     ReplacePortalsRequest,
     ReplaceTilesRequest,
@@ -169,3 +172,172 @@ class RoomLayoutService:
         self.db.commit()
 
         return request_data.portals
+
+    def patch_tiles(
+        self, room_id: int, user: User, request_data: PatchTilesRequest
+    ) -> list[RoomTilePayload]:
+        room = self._get_room(room_id)
+        self._ensure_user_can_edit(room, user)
+
+        upsert_positions = {(t.x, t.y) for t in request_data.upserts}
+        remove_positions = {(p.x, p.y) for p in request_data.removes}
+        if upsert_positions & remove_positions:
+            raise HTTPException(status_code=400, detail="Same tile coordinates cannot be upserted and removed")
+
+        if len(upsert_positions) != len(request_data.upserts):
+            raise HTTPException(status_code=400, detail="Duplicate tile coordinates in upserts")
+
+        for tile in request_data.upserts:
+            if tile.x >= room.width or tile.y >= room.height:
+                raise HTTPException(status_code=400, detail="Tile coordinates out of room bounds")
+
+        for pos in request_data.removes:
+            if pos.x >= room.width or pos.y >= room.height:
+                raise HTTPException(status_code=400, detail="Tile remove coordinates out of room bounds")
+
+        for pos in request_data.removes:
+            self.db.query(RoomTile).filter(
+                RoomTile.room_id == room_id, RoomTile.x == pos.x, RoomTile.y == pos.y
+            ).delete(synchronize_session=False)
+
+        for tile in request_data.upserts:
+            existing = self.db.query(RoomTile).filter(
+                RoomTile.room_id == room_id, RoomTile.x == tile.x, RoomTile.y == tile.y
+            ).first()
+            if existing:
+                existing.tile_asset_id = tile.tile_asset_id
+            else:
+                self.db.add(
+                    RoomTile(
+                        room_id=room_id,
+                        x=tile.x,
+                        y=tile.y,
+                        tile_asset_id=tile.tile_asset_id,
+                    )
+                )
+
+        self._touch_room(room)
+        self.db.commit()
+
+        return [
+            RoomTilePayload(x=t.x, y=t.y, tile_asset_id=t.tile_asset_id)
+            for t in self.db.query(RoomTile).filter(RoomTile.room_id == room_id).all()
+        ]
+
+    def patch_objects(
+        self, room_id: int, user: User, request_data: PatchObjectsRequest
+    ) -> list[RoomObjectPayload]:
+        room = self._get_room(room_id)
+        self._ensure_user_can_edit(room, user)
+
+        upsert_positions = {(o.x, o.y) for o in request_data.upserts}
+        remove_positions = {(p.x, p.y) for p in request_data.removes}
+        if upsert_positions & remove_positions:
+            raise HTTPException(
+                status_code=400,
+                detail="Same object coordinates cannot be upserted and removed",
+            )
+
+        if len(upsert_positions) != len(request_data.upserts):
+            raise HTTPException(status_code=400, detail="Duplicate object coordinates in upserts")
+
+        for obj in request_data.upserts:
+            if obj.x >= room.width or obj.y >= room.height:
+                raise HTTPException(status_code=400, detail="Object coordinates out of room bounds")
+
+        for pos in request_data.removes:
+            if pos.x >= room.width or pos.y >= room.height:
+                raise HTTPException(status_code=400, detail="Object remove coordinates out of room bounds")
+
+        for pos in request_data.removes:
+            self.db.query(RoomObject).filter(
+                RoomObject.room_id == room_id, RoomObject.x == pos.x, RoomObject.y == pos.y
+            ).delete(synchronize_session=False)
+
+        for obj in request_data.upserts:
+            existing = self.db.query(RoomObject).filter(
+                RoomObject.room_id == room_id, RoomObject.x == obj.x, RoomObject.y == obj.y
+            ).first()
+            if existing:
+                existing.object_asset_id = obj.object_asset_id
+            else:
+                self.db.add(
+                    RoomObject(
+                        room_id=room_id,
+                        x=obj.x,
+                        y=obj.y,
+                        object_asset_id=obj.object_asset_id,
+                    )
+                )
+
+        self._touch_room(room)
+        self.db.commit()
+
+        return [
+            RoomObjectPayload(x=o.x, y=o.y, object_asset_id=o.object_asset_id)
+            for o in self.db.query(RoomObject).filter(RoomObject.room_id == room_id).all()
+        ]
+
+    def patch_portals(
+        self, room_id: int, user: User, request_data: PatchPortalsRequest
+    ) -> list[RoomPortalPayload]:
+        room = self._get_room(room_id)
+        self._ensure_user_can_edit(room, user)
+
+        upsert_positions = {(p.from_x, p.from_y) for p in request_data.upserts}
+        remove_positions = {(p.from_x, p.from_y) for p in request_data.removes}
+        if upsert_positions & remove_positions:
+            raise HTTPException(
+                status_code=400,
+                detail="Same portal coordinates cannot be upserted and removed",
+            )
+
+        if len(upsert_positions) != len(request_data.upserts):
+            raise HTTPException(status_code=400, detail="Duplicate portal coordinates in upserts")
+
+        target_room_ids = {portal.to_room_id for portal in request_data.upserts}
+        if target_room_ids:
+            existing_target_ids = {
+                r.id for r in self.db.query(Room).filter(Room.id.in_(target_room_ids)).all()
+            }
+            missing = target_room_ids - existing_target_ids
+            if missing:
+                raise HTTPException(status_code=400, detail=f"Invalid target room ids: {sorted(missing)}")
+
+        for portal in request_data.upserts:
+            if portal.from_x >= room.width or portal.from_y >= room.height:
+                raise HTTPException(status_code=400, detail="Portal coordinates out of room bounds")
+
+        for pos in request_data.removes:
+            if pos.from_x >= room.width or pos.from_y >= room.height:
+                raise HTTPException(status_code=400, detail="Portal remove coordinates out of room bounds")
+
+        for pos in request_data.removes:
+            self.db.query(RoomPortal).filter(
+                RoomPortal.from_room_id == room_id,
+                RoomPortal.from_x == pos.from_x,
+                RoomPortal.from_y == pos.from_y,
+            ).delete(synchronize_session=False)
+
+        for portal in request_data.upserts:
+            self.db.query(RoomPortal).filter(
+                RoomPortal.from_room_id == room_id,
+                RoomPortal.from_x == portal.from_x,
+                RoomPortal.from_y == portal.from_y,
+            ).delete(synchronize_session=False)
+            self.db.add(
+                RoomPortal(
+                    from_room_id=room_id,
+                    from_x=portal.from_x,
+                    from_y=portal.from_y,
+                    to_room_id=portal.to_room_id,
+                )
+            )
+
+        self._touch_room(room)
+        self.db.commit()
+
+        return [
+            RoomPortalPayload(from_x=p.from_x, from_y=p.from_y, to_room_id=p.to_room_id)
+            for p in self.db.query(RoomPortal).filter(RoomPortal.from_room_id == room_id).all()
+        ]
