@@ -26,7 +26,7 @@ app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 # Router 등록
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(user.router, prefix="/api", tags=["users"])
-app.include_router(team.router, prefix="/api")
+app.include_router(team.router, prefix="/api", tags=["team"])
 
 
 @app.get("/")
