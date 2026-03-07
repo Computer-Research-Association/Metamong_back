@@ -6,7 +6,6 @@ import { ServerGlobal } from "../app.config";
 export class MyRoom extends Room<MyRoomState> {
   maxClients = 4;
 
-
   /*
   방에 들어올 때 이 함수가 실행되므로
   유니티에서 client.JoinOrCreate("room_name", options) 이 함수를 실행할 때, option에 jwt를 넣을 것
@@ -21,23 +20,23 @@ export class MyRoom extends Room<MyRoomState> {
 
     try {
       const decoded = jwt.verify(token, ServerGlobal.publicKey, {
-        algorithms: ["RS256"],
+        algorithms: ["HS256"],
       }) as any;
 
       //todo: jwt payload에 뭘 넣을지에 따라 달라져야함
       return {
         userId: decoded.sub,
         nickname: decoded.nickname,
-        role: decoded.role
+        role: decoded.role,
       };
     } catch (err) {
-      const errorMessage = (err instanceof Error) ? err.message : "Unknown Error";
+      const errorMessage = err instanceof Error ? err.message : "Unknown Error";
       console.error("Authentication failed:", errorMessage);
       return false;
     }
   }
 
-  onCreate (options: any) {
+  onCreate(options: any) {
     //this.setState(new MyRoomState()); < 이 표현 방식은 deprecated됨
     this.state = new MyRoomState();
 
@@ -53,7 +52,7 @@ export class MyRoom extends Room<MyRoomState> {
   }
 
   update(deltaTime: number) {
-    this.state.players.forEach(player => {
+    this.state.players.forEach((player) => {
       let inputX = player.inputX;
       let inputY = player.inputY;
 
@@ -71,12 +70,12 @@ export class MyRoom extends Room<MyRoomState> {
     });
   }
 
-  onJoin (client: Client, options: any) {
+  onJoin(client: Client, options: any) {
     console.log(client.sessionId, "joined!");
     this.state.players.set(client.sessionId, new Player());
   }
 
-  onLeave (client: Client, consented: boolean) {
+  onLeave(client: Client, consented: boolean) {
     console.log(client.sessionId, "left!");
     this.state.players.delete(client.sessionId);
   }
@@ -84,5 +83,4 @@ export class MyRoom extends Room<MyRoomState> {
   onDispose() {
     console.log("room", this.roomId, "disposing...");
   }
-
 }
