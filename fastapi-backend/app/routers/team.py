@@ -3,8 +3,11 @@
 
 팀에 대한 REST API 엔드포인트를 정의합니다.
 - POST /teams/create: 팀 생성 (현재 로그인 유저를 소유자로 팀 추가)
+- GET /teams: 팀 목록 조회 (최신 생성순, 인증 불필요)
 - GET /teams/{team_id}: id로 팀 조회 (인증 불필요)
 """
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -37,6 +40,16 @@ async def create_team(
             status_code=400,
             detail="이미 같은 이름의 팀이 존재합니다.",
         )
+
+
+@router.get("/list", response_model=List[TeamResponse])
+async def list_teams(db: Session = Depends(get_db)):
+    """
+    팀 목록을 조회합니다. 최신 생성순으로 반환하며, 각 팀에 소유자(owner) 정보가 포함.
+    """
+    team_service = TeamService(db)
+    teams = team_service.get_teams()
+    return teams
 
 
 @router.get("/{team_id}", response_model=TeamResponse)
