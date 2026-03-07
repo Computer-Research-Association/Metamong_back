@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 
 from app.db.models import Team, User
-from app.schemas.team import TeamCreate
+from app.schemas.team import TeamCreate, TeamUpdate
 
 
 class TeamService:
@@ -66,3 +66,23 @@ class TeamService:
         # 응답 직렬화 시 owner 사용하므로 미리 로드
         _ = team.owner
         return team
+
+    def update_team(self, team: Team, update_data: TeamUpdate) -> Team:
+        """
+        팀 정보를 수정합니다. (이름 등) 호출 전에 소유자 여부는 라우터에서 검사합니다.
+
+        :param team: 수정할 Team 엔티티
+        :param update_data: 변경할 필드 (name 등)
+        :return: 수정된 Team (owner 로드됨)
+        :raises: 이름 중복 시 IntegrityError
+        """
+        if update_data.name is not None:
+            team.name = update_data.name.strip()
+        try:
+            self.db.commit()
+            self.db.refresh(team)
+            _ = team.owner
+            return team
+        except IntegrityError:
+            self.db.rollback()
+            raise
