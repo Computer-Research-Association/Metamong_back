@@ -2,6 +2,7 @@
 팀(Team) API 요청/응답 스키마.
 
 - TeamCreate: 팀 생성 시 클라이언트가 보내는 body (이름만 필요, 소유자는 로그인 유저로 설정됨)
+- TeamUpdate: 팀 수정 시 보내는 body (변경할 필드만, PATCH용)
 - TeamResponse: 팀 생성·조회 시 API가 반환하는 형태 (id, name, owner_user_id, created_at, owner 유저 정보)
 """
 from datetime import datetime
@@ -15,6 +16,12 @@ class TeamCreate(BaseModel):
     """팀 생성 요청 body. 팀 이름만 받고, 소유자(owner)는 인증된 현재 유저로 설정됨."""
 
     name: str = Field(..., min_length=1, max_length=50, description="팀 이름")
+
+
+class TeamUpdate(BaseModel):
+    """팀 수정 요청 body (PATCH). 보내진 필드만 변경됨."""
+
+    name: str | None = Field(None, min_length=1, max_length=50, description="팀 이름")
 
 
 class TeamResponse(BaseModel):
