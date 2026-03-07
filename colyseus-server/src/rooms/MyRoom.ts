@@ -19,7 +19,8 @@ export class MyRoom extends Room<MyRoomState> {
     }
 
     try {
-      const decoded = jwt.verify(token, ServerGlobal.publicKey, {
+      const decoded = jwt.verify(token, ServerGlobal.publicKey.key, {
+        //algorithms: [ServerGlobal.publicKey.algorithm as Algorithm],
         algorithms: ["HS256"],
       }) as any;
 
@@ -40,7 +41,7 @@ export class MyRoom extends Room<MyRoomState> {
     //this.setState(new MyRoomState()); < 이 표현 방식은 deprecated됨
     this.state = new MyRoomState();
 
-    this.onMessage("input", (client, input) => {
+    this.onMessage("move", (client, input) => {
       const player = this.state.players.get(client.sessionId);
       if (player) {
         player.inputX = input.x;
