@@ -17,14 +17,22 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: DB_PASSWORD,JWT_SECRET
+          envs: DB_PASSWORD,JWT_SECRET,SECRET_KEY,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,BACKEND_URL,FRONTEND_URL
           script: |
             cd /home/metamong/Metamong_back
             git pull origin main
 
             # .env 파일 재생성 (서버에 평문 저장 방지를 위해 매 배포 시 덮어씀)
-            printf "DB_PASSWORD=%s\nJWT_SECRET=%s\nNODE_ENV=production\n" \
-              "$DB_PASSWORD" "$JWT_SECRET" > .env
+            cat > .env <<EOF
+            DB_PASSWORD=$DB_PASSWORD
+            JWT_SECRET=$JWT_SECRET
+            SECRET_KEY=$SECRET_KEY
+            GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+            GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+            BACKEND_URL=$BACKEND_URL
+            FRONTEND_URL=$FRONTEND_URL
+            NODE_ENV=production
+            EOF
 
             docker compose down
             docker compose up --build -d
@@ -32,3 +40,8 @@ jobs:
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
