@@ -38,3 +38,10 @@ class RoomResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class RoomListResponse(BaseModel):
+    total: int
+    limit: int
+    offset: int
+    rooms: list[RoomResponse]

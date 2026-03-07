@@ -1,6 +1,7 @@
 import hashlib
 
 from fastapi import HTTPException
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.db.enums import OwnerType
@@ -9,6 +10,7 @@ from app.schemas.room import RoomCreate, RoomUpdate
 
 
 class RoomService:
+# 룸 생성, 조회, 수정 등의 비즈니스 로직을 담당하는 서비스 클래스
     def __init__(self, db: Session):
         self.db = db
 
@@ -56,6 +58,25 @@ class RoomService:
 
         self._ensure_user_can_read(room, user)
         return room
+
+    def list_rooms(
+        self, user: User, limit: int = 20, offset: int = 0, mine_only: bool = False
+    ) -> tuple[int, list[Room]]:
+        query = self.db.query(Room)
+
+        if mine_only:
+            query = query.filter(Room.owner_type == OwnerType.USER, Room.owner_id == user.id)
+        else:
+            query = query.filter(
+                or_(
+                    Room.is_public.is_(True),
+                    (Room.owner_type == OwnerType.USER) & (Room.owner_id == user.id),
+                )
+            )
+
+        total = query.count()
+        rooms = query.order_by(Room.updated_at.desc()).offset(offset).limit(limit).all()
+        return total, rooms
 
     def update_room(self, room_id: int, user: User, room_data: RoomUpdate) -> Room:
         room = self.db.query(Room).filter(Room.id == room_id).first()
