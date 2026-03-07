@@ -2,8 +2,8 @@
 팀(Team) API 라우터.
 
 팀에 대한 REST API 엔드포인트를 정의합니다.
-- POST /teams: 팀 생성 (현재 로그인 유저를 소유자로 팀 추가)
-- (추후) GET /teams/{id}: id로 팀 조회 등 확장 예정
+- POST /teams/create: 팀 생성 (현재 로그인 유저를 소유자로 팀 추가)
+- GET /teams/{team_id}: id로 팀 조회 (인증 불필요)
 """
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -37,3 +37,15 @@ async def create_team(
             status_code=400,
             detail="이미 같은 이름의 팀이 존재합니다.",
         )
+
+
+@router.get("/{team_id}", response_model=TeamResponse)
+async def get_team(team_id: int, db: Session = Depends(get_db)):
+    """
+    팀 id로 팀 정보를 조회합니다. 팀이 없으면 404를 반환합니다.
+    """
+    team_service = TeamService(db)
+    team = team_service.get_team_by_id(team_id)
+    if team is None:
+        raise HTTPException(status_code=404, detail="팀을 찾을 수 없습니다.")
+    return team
