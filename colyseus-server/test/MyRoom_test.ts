@@ -1,31 +1,57 @@
 import assert from "assert";
+import { generateKeyPairSync } from "crypto";
+import jwt from "jsonwebtoken";
 import { ColyseusTestServer, boot } from "@colyseus/testing";
 
-// import your "app.config.ts" file here.
-import appConfig from "../src/app.config";
+import appConfig, { ServerGlobal } from "../src/app.config";
 import { MyRoomState } from "../src/rooms/schema/MyRoomState";
 
 describe("testing your Colyseus app", () => {
   let colyseus: ColyseusTestServer;
 
-  before(async () => colyseus = await boot(appConfig));
-  after(async () => colyseus.shutdown());
+  before(async () => {
+    const { privateKey, publicKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
+
+    ServerGlobal.publicKey = publicKey.export({ type: "pkcs1", format: "pem" }).toString();
+
+    const token = jwt.sign(
+      { nickname: "tester", role: "player" },
+      privateKey.export({ type: "pkcs1", format: "pem" }).toString(),
+      {
+        algorithm: "RS256",
+        subject: "user-1",
+        expiresIn: "1h",
+      }
+    );
+
+    colyseus = await boot(appConfig);
+
+    // keep token for test scope
+    (global as any).__TEST_TOKEN__ = token;
+  });
+
+  after(async () => {
+    delete (global as any).__TEST_TOKEN__;
+    await colyseus.shutdown();
+  });
 
   beforeEach(async () => await colyseus.cleanup());
 
   it("connecting into a room", async () => {
-    // `room` is the server-side Room instance reference.
     const room = await colyseus.createRoom<MyRoomState>("my_room", {});
 
-    // `client1` is the client-side `Room` instance reference (same as JavaScript SDK)
-    const client1 = await colyseus.connectTo(room);
+    const client1 = await colyseus.connectTo(room, {
+      token: (global as any).__TEST_TOKEN__,
+    });
 
-    // make your assertions
     assert.strictEqual(client1.sessionId, room.clients[0].sessionId);
 
-    // wait for state sync
     await room.waitForNextPatch();
 
-    assert.deepStrictEqual({ mySynchronizedProperty: "Hello world" }, client1.state.toJSON());
+    const player = client1.state.players[client1.sessionId];
+    assert.ok(player, "player should be added to room state");
+    assert.strictEqual(player.x, 0);
+    assert.strictEqual(player.y, 0);
+    assert.strictEqual(player.speed, 200);
   });
 });

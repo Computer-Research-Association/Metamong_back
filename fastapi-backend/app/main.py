@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.core.config import settings
-from app.routers import auth, user
+from app.routers import auth, room, user
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -26,6 +26,7 @@ app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 # Router 등록
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(user.router, prefix="/api", tags=["users"])
+app.include_router(room.router, prefix="/api", tags=["rooms"])
 
 
 @app.get("/")
