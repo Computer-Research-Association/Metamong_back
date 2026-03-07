@@ -1,2 +1,5 @@
 # Docker database data
 postgres_data/
+
+# Environment variables
+.env
