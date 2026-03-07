@@ -27,6 +27,11 @@ services:
     environment:
       - DATABASE_URL=postgresql://team_admin:${DB_PASSWORD}@db:5432/metaverse_db
       - JWT_SECRET=${JWT_SECRET}
+      - SECRET_KEY=${SECRET_KEY}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - BACKEND_URL=${BACKEND_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
     ports:
       - "8000:8000"
     depends_on:

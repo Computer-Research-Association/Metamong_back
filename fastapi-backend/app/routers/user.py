@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.schemas.user import UserResponse, RCUpdate, InitializeUserInfo
+from app.schemas.user import UserResponse, UserUpdate, InitializeUserInfo
 from app.db.models import User
-from app.db.enums import UserStatus
 from app.services.user_service import UserService
 from app.db.database import get_db
 from app.dependencies.auth import get_current_user
@@ -16,14 +15,17 @@ async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
-@router.patch("/me/rc", response_model=UserResponse)
-async def update_my_rc(
-    rc_data: RCUpdate,
+@router.patch("/me", response_model=UserResponse)
+async def update_me(
+    update_data: UserUpdate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    if not update_data.model_fields_set:
+        raise HTTPException(status_code=400, detail="No fields to update")
+
     user_service = UserService(db)
-    updated_user = user_service.update_user_rc(current_user, rc_data.rc)
+    updated_user = user_service.update_user(current_user, update_data)
     return updated_user
 
 

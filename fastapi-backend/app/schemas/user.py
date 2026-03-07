@@ -22,8 +22,15 @@ class UserResponse(BaseModel):
         from_attributes = True
 
 
-class RCUpdate(BaseModel):
-    rc: RC
+class UserUpdate(BaseModel):
+    rc: Optional[RC] = None
+    nickname: Optional[str] = None
+    real_name: Optional[str] = None
+    student_id: Optional[str] = None
+    major: Optional[str] = None
+    phone_number: Optional[str] = None
+    instagram_id: Optional[str] = None
+    mbti: Optional[MBTI] = None
 
 
 class InitializeUserInfo(BaseModel):
