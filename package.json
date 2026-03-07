@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@colyseus/core": "^0.17.37",
+    "@colyseus/monitor": "^0.17.7",
+    "@colyseus/playground": "^0.17.11",
+    "@colyseus/schema": "^4.0.15",
+    "@colyseus/tools": "^0.17.19",
+    "jsonwebtoken": "^9.0.3"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10"
+  }
+}

@@ -19,8 +19,8 @@ export class MyRoom extends Room<MyRoomState> {
     }
 
     try {
-      const decoded = jwt.verify(token, ServerGlobal.publicKey, {
-        algorithms: ["HS256"],
+      const decoded = jwt.verify(token, ServerGlobal.publicKey.key, {
+        algorithms: [ServerGlobal.publicKey.algorithm],
       }) as any;
 
       //todo: jwt payload에 뭘 넣을지에 따라 달라져야함
@@ -36,11 +36,11 @@ export class MyRoom extends Room<MyRoomState> {
     }
   }
 
-  onCreate(options: any) {
+  onCreate (options: any) {
     //this.setState(new MyRoomState()); < 이 표현 방식은 deprecated됨
     this.state = new MyRoomState();
 
-    this.onMessage("input", (client, input) => {
+    this.onMessage("move", (client, input) => {
       const player = this.state.players.get(client.sessionId);
       if (player) {
         player.inputX = input.x;
@@ -50,6 +50,7 @@ export class MyRoom extends Room<MyRoomState> {
 
     this.setSimulationInterval((deltaTime) => this.update(deltaTime));
   }
+
 
   update(deltaTime: number) {
     this.state.players.forEach((player) => {
