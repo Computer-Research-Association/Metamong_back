@@ -24,8 +24,11 @@ class TeamService:
         :return: 생성된 Team 엔티티 (owner relationship 로드됨)
         :raises: 이름 중복 시 IntegrityError → 라우터에서 400으로 변환 가능
         """
+        name = create_data.name.strip()
+        if not name:
+            raise ValueError("팀 이름은 공백만으로 할 수 없습니다.")
         team = Team(
-            name=create_data.name.strip(),
+            name=name,
             owner_user_id=owner.id,
         )
         self.db.add(team)
@@ -77,7 +80,10 @@ class TeamService:
         :raises: 이름 중복 시 IntegrityError
         """
         if update_data.name is not None:
-            team.name = update_data.name.strip()
+            name = update_data.name.strip()
+            if not name:
+                raise ValueError("팀 이름은 공백만으로 할 수 없습니다.")
+            team.name = name
         try:
             self.db.commit()
             self.db.refresh(team)

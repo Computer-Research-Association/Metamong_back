@@ -36,6 +36,8 @@ async def create_team(
     try:
         team = team_service.create_team(current_user, create_data)
         return team
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except IntegrityError:
         raise HTTPException(
             status_code=400,
@@ -86,6 +88,8 @@ async def update_team(
     try:
         updated = team_service.update_team(team, update_data)
         return updated
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except IntegrityError:
         raise HTTPException(
             status_code=400,
