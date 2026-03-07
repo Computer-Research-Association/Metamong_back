@@ -49,7 +49,7 @@ services:
     environment:
       - API_URL=http://fastapi:8000
       - JWT_SECRET=${JWT_SECRET}
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV}
     ports:
       - "2567:2567"
     depends_on:
