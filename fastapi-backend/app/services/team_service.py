@@ -38,3 +38,17 @@ class TeamService:
         except IntegrityError:
             self.db.rollback()
             raise
+
+    def get_team_by_id(self, team_id: int) -> Team | None:
+        """
+        팀 id로 팀을 조회합니다. owner 관계까지 로드해 둡니다.
+
+        :param team_id: 조회할 팀 id
+        :return: 팀이 있으면 Team, 없으면 None
+        """
+        team = self.db.query(Team).filter(Team.id == team_id).first()
+        if team is None:
+            return None
+        # 응답 직렬화 시 owner 사용하므로 미리 로드
+        _ = team.owner
+        return team
