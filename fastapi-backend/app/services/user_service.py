@@ -2,15 +2,34 @@ from sqlalchemy.orm import Session
 
 from app.db.models import User
 from app.db.enums import RC, UserStatus
-from app.schemas.user import InitializeUserInfo
+from app.schemas.user import InitializeUserInfo, UserUpdate
 
 
 class UserService:
     def __init__(self, db: Session):
         self.db = db
 
-    def update_user_rc(self, user: User, new_rc: RC) -> User:
-        user.rc = new_rc
+    def update_user(self, user: User, update_data: UserUpdate) -> User:
+        if update_data.rc is not None:
+            user.rc = update_data.rc
+        if update_data.nickname is not None:
+            user.nickname = update_data.nickname
+        if update_data.real_name is not None:
+            user.real_name = update_data.real_name
+        if update_data.student_id is not None:
+            user.student_id = update_data.student_id
+        if update_data.major is not None:
+            user.major = update_data.major
+        if update_data.phone_number is not None:
+            user.phone_number = update_data.phone_number
+        if update_data.instagram_id is not None:
+            user.instagram_id = update_data.instagram_id
+        if update_data.mbti is not None:
+            user.mbti = update_data.mbti
+
+        if user.status == UserStatus.NEW and user.rc != RC.UNASSIGNED:
+            user.status = UserStatus.ACTIVE
+
         self.db.commit()
         self.db.refresh(user)
         return user
