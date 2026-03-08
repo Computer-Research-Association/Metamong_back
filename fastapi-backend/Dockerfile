@@ -10,5 +10,5 @@ RUN uv sync --frozen --no-cache
 # 소스 코드 복사
 COPY . .
 
-# 실행 (uv run을 통해 설치된 환경에서 실행)
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# 실행 (마이그레이션 후 서버 시작)
+CMD ["sh", "-c", "uv run alembic upgrade head && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000"]
