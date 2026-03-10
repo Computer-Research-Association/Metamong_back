@@ -76,10 +76,9 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
     restart: always
-    command: tunnel --config /etc/cloudflared/config.yml run
+    command: tunnel --config /root/.cloudflared/config.yml run
     volumes:
-      - /etc/cloudflared:/etc/cloudflared
-      - /root/.cloudflared:/root/.cloudflared
+      - /home/metamong/.cloudflared:/root/.cloudflared
     depends_on:
       fastapi:
         condition: service_healthy
