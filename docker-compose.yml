@@ -71,6 +71,23 @@ services:
     networks:
       - metaverse-network
 
+  # 4. Cloudflare Tunnel
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: always
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - /etc/cloudflared:/etc/cloudflared
+      - /root/.cloudflared:/root/.cloudflared
+    depends_on:
+      fastapi:
+        condition: service_healthy
+      colyseus:
+        condition: service_started
+    networks:
+      - metaverse-network
+
 networks:
   metaverse-network:
     driver: bridge
