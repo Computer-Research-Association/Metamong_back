@@ -2,7 +2,7 @@
 Avatar API 라우터.
 
 - POST /avatars/create: 새 아바타 생성 (인증 필요, 현재 유저 소유로 생성)
-- GET /avatars: user_id 쿼리로 해당 유저의 모든 아바타 조회
+- GET /avatars/list: 본인 아바타 목록 조회 (인증 필요, 본인만)
 - GET /avatars/{avatar_id}: id로 아바타 조회
 - DELETE /avatars/{avatar_id}: id로 아바타 삭제 (소유자만 가능)
 """
@@ -35,12 +35,15 @@ async def create_avatar(
 
 
 @router.get("/list", response_model=List[AvatarResponse])
-async def list_avatars_by_user(user_id: int, db: Session = Depends(get_db)):
+async def list_avatars_by_user(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     """
-    user_id로 해당 유저의 모든 아바타를 조회합니다. 빈 목록이면 []를 반환합니다.
+    로그인한 유저(본인)의 모든 아바타를 조회합니다. 본인 외에는 조회할 수 없습니다. 빈 목록이면 []를 반환합니다.
     """
     avatar_service = AvatarService(db)
-    avatars = avatar_service.get_avatars_by_user_id(user_id)
+    avatars = avatar_service.get_avatars_by_user_id(current_user.id)
     return avatars
 
 
