@@ -29,6 +29,20 @@ class AvatarService:
         self.db.refresh(avatar)
         return avatar
 
+    def get_avatars_by_user_id(self, user_id: int) -> list[Avatar]:
+        """
+        user_id로 해당 유저의 모든 아바타를 조회합니다.
+
+        :param user_id: 조회할 유저 id
+        :return: 해당 유저의 Avatar 목록
+        """
+        return (
+            self.db.query(Avatar)
+            .filter(Avatar.user_id == user_id)
+            .order_by(Avatar.id)
+            .all()
+        )
+
     def get_avatar_by_id(self, avatar_id: int) -> Avatar | None:
         """
         Avatar id로 아바타를 조회합니다.
