@@ -2,9 +2,12 @@
 Avatar API 라우터.
 
 - POST /avatars/create: 새 아바타 생성 (인증 필요, 현재 유저 소유로 생성)
+- GET /avatars: user_id 쿼리로 해당 유저의 모든 아바타 조회
 - GET /avatars/{avatar_id}: id로 아바타 조회
 - DELETE /avatars/{avatar_id}: id로 아바타 삭제 (소유자만 가능)
 """
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -29,6 +32,16 @@ async def create_avatar(
     avatar_service = AvatarService(db)
     avatar = avatar_service.create_avatar(current_user, create_data)
     return avatar
+
+
+@router.get("/list", response_model=List[AvatarResponse])
+async def list_avatars_by_user(user_id: int, db: Session = Depends(get_db)):
+    """
+    user_id로 해당 유저의 모든 아바타를 조회합니다. 빈 목록이면 []를 반환합니다.
+    """
+    avatar_service = AvatarService(db)
+    avatars = avatar_service.get_avatars_by_user_id(user_id)
+    return avatars
 
 
 @router.get("/{avatar_id}", response_model=AvatarResponse)
