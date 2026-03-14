@@ -76,11 +76,12 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
     restart: always
-    command: tunnel --config /home/nonroot/.cloudflared/config.yml run
+    user: "1001:1001"
+    command: tunnel --config /tmp/.cloudflared/config.yml run
     environment:
-      - TUNNEL_ORIGIN_CERT=/home/nonroot/.cloudflared/cert.pem
+      - TUNNEL_ORIGIN_CERT=/tmp/.cloudflared/cert.pem
     volumes:
-      - /home/metamong/.cloudflared:/home/nonroot/.cloudflared
+      - /home/metamong/.cloudflared:/tmp/.cloudflared
     depends_on:
       fastapi:
         condition: service_healthy
