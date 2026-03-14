@@ -37,3 +37,12 @@ class AvatarService:
         :return: 있으면 Avatar, 없으면 None
         """
         return self.db.query(Avatar).filter(Avatar.id == avatar_id).first()
+
+    def delete_avatar(self, avatar: Avatar) -> None:
+        """
+        아바타를 삭제합니다. 호출 전에 소유자 여부는 라우터에서 검사합니다.
+
+        :param avatar: 삭제할 Avatar 엔티티
+        """
+        self.db.delete(avatar)
+        self.db.commit()
