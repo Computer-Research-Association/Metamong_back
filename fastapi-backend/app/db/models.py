@@ -256,6 +256,7 @@ class Avatar(Base):
     user_id: Mapped[int] = mapped_column(
         BigInteger, ForeignKey("users.id"), nullable=False)
     avatar_asset_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    nickname: Mapped[str] = mapped_column(String(50), nullable=False)
 
     user: Mapped["User"] = relationship("User", back_populates="avatars")
 
