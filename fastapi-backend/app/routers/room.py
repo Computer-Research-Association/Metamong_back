@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.db.models import User
 from app.dependencies.auth import get_current_user
+from app.schemas.room_role import RoomRoleListResponse, RoomRoleResponse, RoomRoleUpdateRequest
 from app.schemas.room_layout import (
     PatchObjectsRequest,
     PatchObjectsResponse,
@@ -21,6 +22,7 @@ from app.schemas.room_layout import (
 )
 from app.schemas.room import RoomCreate, RoomListResponse, RoomResponse, RoomUpdate
 from app.services.room_layout_service import RoomLayoutService
+from app.services.room_role_service import RoomRoleService
 from app.services.room_service import RoomService
 
 router = APIRouter(prefix="/rooms", tags=["rooms"])
@@ -177,3 +179,56 @@ async def patch_room_portals(
     room_layout_service = RoomLayoutService(db)
     portals = room_layout_service.patch_portals(room_id, current_user, request_data)
     return PatchPortalsResponse(room_id=room_id, portals=portals)
+
+
+@router.get("/{room_id}/roles", response_model=RoomRoleListResponse)
+# 룸 역할 목록 조회 API
+async def list_room_roles(
+    room_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    room_role_service = RoomRoleService(db)
+    roles = room_role_service.list_roles(room_id, current_user)
+    return RoomRoleListResponse(room_id=room_id, roles=roles)
+
+
+@router.get("/{room_id}/roles/me", response_model=RoomRoleResponse)
+# 내 역할 조회 API
+async def get_my_room_role(
+    room_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    room_role_service = RoomRoleService(db)
+    return room_role_service.get_role(room_id, current_user.id, current_user)
+
+
+@router.patch("/{room_id}/roles/{target_user_id}", response_model=RoomRoleResponse)
+# 룸 역할 수정 API
+async def upsert_room_role(
+    room_id: int,
+    target_user_id: int,
+    request_data: RoomRoleUpdateRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    room_role_service = RoomRoleService(db)
+    return room_role_service.upsert_role(
+        room_id=room_id,
+        target_user_id=target_user_id,
+        role=request_data.role,
+        current_user=current_user,
+    )
+
+
+@router.get("/{room_id}/roles/{target_user_id}", response_model=RoomRoleResponse)
+# 룸 특정 유저 역할 조회 API
+async def get_room_role(
+    room_id: int,
+    target_user_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    room_role_service = RoomRoleService(db)
+    return room_role_service.get_role(room_id, target_user_id, current_user)
