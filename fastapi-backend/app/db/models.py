@@ -8,8 +8,8 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.db.database import Base
 from app.db.enums import AuthProvider, RC, UserStatus, RoomType, OwnerType, RoomRoleType, FriendStatus, MBTI
 
-if TYPE_CHECKING:
-    from app.db.models import Team
+if TYPE_CHECKING: # 순환 참조 방지용(이거 없으면 무한 참조 땜에 ImportError남)
+    from app.db.models import Team, Avatar
 
 
 class User(Base):
@@ -57,6 +57,8 @@ class User(Base):
 
     owned_teams: Mapped[List["Team"]] = relationship(
         "Team", back_populates="owner")
+    avatars: Mapped[List["Avatar"]] = relationship(
+        "Avatar", back_populates="user")
 
 
 Index("idx_users_auth_provider", User.auth_provider)
@@ -244,3 +246,18 @@ Index(
     Friend.friend_user_id,
     unique=True,
 )
+
+
+class Avatar(Base):
+    __tablename__ = "avatars"
+
+    id: Mapped[int] = mapped_column(
+        BigInteger, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("users.id"), nullable=False)
+    avatar_asset_id: Mapped[str] = mapped_column(String(100), nullable=False)
+
+    user: Mapped["User"] = relationship("User", back_populates="avatars")
+
+
+Index("idx_avatars_user_id", Avatar.user_id)
