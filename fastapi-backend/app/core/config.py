@@ -22,8 +22,11 @@ class Settings(BaseSettings):
     BACKEND_URL: str = ""
     FRONTEND_URL: str = "" # Unity WEBGL 빌드가 호스팅 될 도메인
 
+    # Environment
+    NODE_ENV: str = "production"
+
     model_config = SettingsConfigDict(
-        env_file=".env"
+        env_file=["../.env", ".env"]  # 루트 .env 우선, fastapi-backend/.env로 로컬 오버라이드 가능
     )
 
 
