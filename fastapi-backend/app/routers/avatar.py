@@ -1,8 +1,9 @@
 """
 Avatar API 라우터.
 
-- POST /avatars: 새 아바타 생성 (인증 필요, 현재 유저 소유로 생성)
+- POST /avatars/create: 새 아바타 생성 (인증 필요, 현재 유저 소유로 생성)
 - GET /avatars/{avatar_id}: id로 아바타 조회
+- DELETE /avatars/{avatar_id}: id로 아바타 삭제 (소유자만 가능)
 """
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -40,3 +41,21 @@ async def get_avatar(avatar_id: int, db: Session = Depends(get_db)):
     if avatar is None:
         raise HTTPException(status_code=404, detail="아바타를 찾을 수 없습니다.")
     return avatar
+
+
+@router.delete("/{avatar_id}", status_code=204)
+async def delete_avatar(
+    avatar_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    아바타 id로 아바타를 삭제합니다. 본인 소유 아바타만 삭제 가능하며, 없으면 404, 권한 없으면 403을 반환합니다.
+    """
+    avatar_service = AvatarService(db)
+    avatar = avatar_service.get_avatar_by_id(avatar_id)
+    if avatar is None:
+        raise HTTPException(status_code=404, detail="아바타를 찾을 수 없습니다.")
+    if avatar.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="본인의 아바타만 삭제할 수 있습니다.")
+    avatar_service.delete_avatar(avatar)
