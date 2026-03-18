@@ -24,13 +24,13 @@ def dev_login(db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Not found")
 
     user = db.query(User).filter(
-        User.email == "dev@metamong.local",
+        User.email == "dev@metamong.dev",
         User.auth_provider == AuthProvider.LOCAL
     ).first()
 
     if not user:
         user = User(
-            email="dev@metamong.local",
+            email="dev@metamong.dev",
             nickname="DevAdmin",
             real_name="Dev Admin",
             auth_provider=AuthProvider.LOCAL,
