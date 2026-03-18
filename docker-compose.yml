@@ -38,6 +38,7 @@ services:
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - BACKEND_URL=${BACKEND_URL}
       - FRONTEND_URL=${FRONTEND_URL}
+      - NODE_ENV=${NODE_ENV}
     ports:
       - "8000:8000"
     depends_on:
